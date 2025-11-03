@@ -1,43 +1,15 @@
-import { useEffect, useState } from "react";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useState } from "react";
 import { Task } from "@/types/task";
 import { TaskCard } from "@/components/TaskCard";
-import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckSquare } from "lucide-react";
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { userProfile } = useAuth();
+  const [tasks] = useState<Task[]>([]);
+  const [loading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!userProfile) return;
-
-    const q = query(
-      collection(db, "tasks"),
-      where("assignedTo", "==", userProfile.uid),
-      orderBy("createdAt", "desc")
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tasksData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        dueDate: doc.data().dueDate?.toDate(),
-      })) as Task[];
-
-      setTasks(tasksData);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, [userProfile]);
 
   const pendingTasks = tasks.filter((t) => t.status === "pending");
   const inProgressTasks = tasks.filter((t) => t.status === "in-progress");

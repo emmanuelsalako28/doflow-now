@@ -1,36 +1,14 @@
-import { useEffect, useState } from "react";
-import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { useState } from "react";
 import { Task } from "@/types/task";
 import { TaskCard } from "@/components/TaskCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckSquare, Clock, TrendingUp, Users } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { userProfile } = useAuth();
+  const [tasks] = useState<Task[]>([]);
+  const [loading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const q = query(collection(db, "tasks"), orderBy("createdAt", "desc"));
-    
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tasksData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        dueDate: doc.data().dueDate?.toDate(),
-      })) as Task[];
-      
-      setTasks(tasksData);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
 
   const stats = {
     total: tasks.length,
@@ -39,7 +17,7 @@ const Dashboard = () => {
     completed: tasks.filter((t) => t.status === "completed").length,
   };
 
-  const myTasks = tasks.filter((t) => t.assignedTo === userProfile?.uid);
+  const myTasks = tasks;
 
   if (loading) {
     return (
@@ -53,7 +31,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back, {userProfile?.name}!</p>
+        <p className="text-muted-foreground">Welcome to TaskFlow!</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

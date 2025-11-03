@@ -1,26 +1,18 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { UserProfile } from "@/contexts/AuthContext";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 
 const Team = () => {
-  const [users, setUsers] = useState<UserProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(false);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const usersSnapshot = await getDocs(collection(db, "users"));
-      const usersData = usersSnapshot.docs.map((doc) => doc.data() as UserProfile);
-      setUsers(usersData);
-      setLoading(false);
-    };
-
-    fetchUsers();
-  }, []);
+  // Mock team data
+  const users = [
+    { id: "1", name: "John Doe", email: "john@example.com", role: "admin" },
+    { id: "2", name: "Jane Smith", email: "jane@example.com", role: "member" },
+    { id: "3", name: "Mike Johnson", email: "mike@example.com", role: "member" },
+  ];
 
   const getInitials = (name: string) => {
     return name
@@ -55,7 +47,7 @@ const Team = () => {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {users.map((user) => (
-            <Card key={user.uid} className="hover:shadow-md transition-shadow">
+            <Card key={user.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center gap-4 pb-3">
                 <Avatar className="h-12 w-12">
                   <AvatarFallback className="bg-primary text-primary-foreground text-lg">

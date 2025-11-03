@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, addDoc, getDocs, Timestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { useAuth, UserProfile } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,34 +15,28 @@ import { cn } from "@/lib/utils";
 
 const CreateTask = () => {
   const navigate = useNavigate();
-  const { userProfile } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<UserProfile[]>([]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [dueDate, setDueDate] = useState<Date>();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const usersSnapshot = await getDocs(collection(db, "users"));
-      const usersData = usersSnapshot.docs.map((doc) => doc.data() as UserProfile);
-      setUsers(usersData);
-    };
-    fetchUsers();
-  }, []);
+  const mockUsers = [
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
+    { id: "3", name: "Mike Johnson" },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!userProfile) return;
     if (!dueDate) {
       toast.error("Please select a due date");
       return;
     }
 
-    const selectedUser = users.find((u) => u.uid === assignedTo);
+    const selectedUser = mockUsers.find((u) => u.id === assignedTo);
     if (!selectedUser) {
       toast.error("Please select a team member");
       return;
@@ -53,38 +44,13 @@ const CreateTask = () => {
 
     setLoading(true);
 
-    try {
-      await addDoc(collection(db, "tasks"), {
-        title,
-        description,
-        status: "pending",
-        assignedTo,
-        assignedToName: selectedUser.name,
-        createdBy: userProfile.uid,
-        createdAt: Timestamp.now(),
-        dueDate: Timestamp.fromDate(dueDate),
-        progress: 0,
-      });
-
+    // Simulate task creation
+    setTimeout(() => {
       toast.success("Task created successfully!");
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create task");
-    } finally {
       setLoading(false);
-    }
+      navigate("/dashboard");
+    }, 1000);
   };
-
-  if (userProfile?.role !== "admin") {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <p className="text-lg font-medium">Access Denied</p>
-          <p className="text-muted-foreground">Only admins can create tasks</p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -125,9 +91,9 @@ const CreateTask = () => {
                   <SelectValue placeholder="Select team member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {users.map((user) => (
-                    <SelectItem key={user.uid} value={user.uid}>
-                      {user.name} ({user.role})
+                  {mockUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

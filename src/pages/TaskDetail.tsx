@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { Task, TaskStatus } from "@/types/task";
-import { useAuth } from "@/contexts/AuthContext";
+import { TaskStatus } from "@/types/task";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,55 +19,35 @@ const statusConfig = {
 };
 
 const TaskDetail = () => {
-  const { id } = useParams();
   const navigate = useNavigate();
-  const { userProfile } = useAuth();
-  const [task, setTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [status, setStatus] = useState<TaskStatus>("pending");
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    const fetchTask = async () => {
-      if (!id) return;
-      
-      const taskDoc = await getDoc(doc(db, "tasks", id));
-      if (taskDoc.exists()) {
-        const taskData = {
-          id: taskDoc.id,
-          ...taskDoc.data(),
-          createdAt: taskDoc.data().createdAt?.toDate(),
-          dueDate: taskDoc.data().dueDate?.toDate(),
-        } as Task;
-        
-        setTask(taskData);
-        setStatus(taskData.status);
-        setProgress(taskData.progress);
-      }
-      setLoading(false);
-    };
-
-    fetchTask();
-  }, [id]);
+  // Mock task data
+  const task = {
+    id: "1",
+    title: "Sample Task",
+    description: "This is a sample task description",
+    status: "pending" as TaskStatus,
+    assignedTo: "1",
+    assignedToName: "John Doe",
+    createdBy: "1",
+    createdAt: new Date(),
+    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    progress: 0,
+  };
 
   const handleUpdate = async () => {
-    if (!id || !task) return;
-
     setUpdating(true);
-    try {
-      await updateDoc(doc(db, "tasks", id), {
-        status,
-        progress,
-      });
-      
+    
+    // Simulate update
+    setTimeout(() => {
       toast.success("Task updated successfully!");
-      navigate("/dashboard");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to update task");
-    } finally {
       setUpdating(false);
-    }
+      navigate("/dashboard");
+    }, 1000);
   };
 
   if (loading) {
@@ -81,17 +58,7 @@ const TaskDetail = () => {
     );
   }
 
-  if (!task) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <p className="text-lg font-medium">Task not found</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const canEdit = userProfile?.uid === task.assignedTo || userProfile?.role === "admin";
+  const canEdit = true;
   const config = statusConfig[task.status];
 
   return (
@@ -167,11 +134,6 @@ const TaskDetail = () => {
               </>
             )}
 
-            {!canEdit && (
-              <p className="text-sm text-muted-foreground text-center p-4 bg-muted rounded-lg">
-                Only the assigned team member or admins can update this task.
-              </p>
-            )}
           </div>
         </CardContent>
       </Card>
