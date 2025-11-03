@@ -31,7 +31,7 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome to TaskFlow!</p>
+        <p className="text-muted-foreground">Welcome to Onsite Team TaskFlow!</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

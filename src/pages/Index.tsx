@@ -20,7 +20,7 @@ const Index = () => {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckSquare className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">TaskFlow</span>
+            <span className="text-xl font-bold">Onsite TaskFlow</span>
           </div>
           <Button onClick={() => navigate("/auth")}>
             Get Started
@@ -37,7 +37,7 @@ const Index = () => {
               <span className="text-primary"> Made Simple</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Streamline your team's workflow with intuitive task assignment, real-time progress tracking, and seamless collaboration.
+              Streamline the onsite team's workflow with intuitive task assignment, real-time progress tracking, and seamless collaboration.
             </p>
           </div>
 
@@ -87,7 +87,7 @@ const Index = () => {
 
       <footer className="border-t">
         <div className="container flex h-16 items-center justify-center text-sm text-muted-foreground">
-          <p>© 2024 TaskFlow. Built with Firebase and React.</p>
+          <p>© 2025 TaskFlow. Built with Firebase and React.</p>
         </div>
       </footer>
     </div>
