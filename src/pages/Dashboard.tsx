@@ -10,12 +10,11 @@ const Dashboard = () => {
   const { tasks } = useTasks();
   const { currentUser } = useUser();
 
-  const myTasks = tasks.filter((t) => t.assignedTo === currentUser.id);
   const stats = {
-    total: myTasks.length,
-    pending: myTasks.filter((t) => t.status === "pending").length,
-    inProgress: myTasks.filter((t) => t.status === "in-progress").length,
-    completed: myTasks.filter((t) => t.status === "completed").length,
+    total: tasks.length,
+    pending: tasks.filter((t) => t.status === "pending").length,
+    inProgress: tasks.filter((t) => t.status === "in-progress").length,
+    completed: tasks.filter((t) => t.status === "completed").length,
   };
 
   return (
@@ -68,18 +67,18 @@ const Dashboard = () => {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4">My Tasks</h2>
-        {myTasks.length === 0 ? (
+        <h2 className="text-2xl font-semibold mb-4">All Tasks</h2>
+        {tasks.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <CheckSquare className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium">No tasks assigned</p>
-              <p className="text-muted-foreground">You're all caught up!</p>
+              <p className="text-lg font-medium">No tasks yet</p>
+              <p className="text-muted-foreground">Create your first task to get started!</p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {myTasks.map((task) => (
+            {tasks.map((task) => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -88,19 +87,6 @@ const Dashboard = () => {
             ))}
           </div>
         )}
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">All Tasks</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onClick={() => navigate(`/tasks/${task.id}`)}
-            />
-          ))}
-        </div>
       </div>
     </div>
   );
