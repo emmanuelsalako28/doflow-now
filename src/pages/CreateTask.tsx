@@ -12,21 +12,19 @@ import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTasks } from "@/contexts/TaskContext";
+import { useUser } from "@/contexts/UserContext";
 
 const CreateTask = () => {
   const navigate = useNavigate();
+  const { addTask } = useTasks();
+  const { users, currentUser } = useUser();
   const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [dueDate, setDueDate] = useState<Date>();
-
-  const mockUsers = [
-    { id: "1", name: "John Doe" },
-    { id: "2", name: "Jane Smith" },
-    { id: "3", name: "Mike Johnson" },
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +34,7 @@ const CreateTask = () => {
       return;
     }
 
-    const selectedUser = mockUsers.find((u) => u.id === assignedTo);
+    const selectedUser = users.find((u) => u.id === assignedTo);
     if (!selectedUser) {
       toast.error("Please select a team member");
       return;
@@ -44,12 +42,20 @@ const CreateTask = () => {
 
     setLoading(true);
 
-    // Simulate task creation
-    setTimeout(() => {
-      toast.success("Task created successfully!");
-      setLoading(false);
-      navigate("/dashboard");
-    }, 1000);
+    addTask({
+      title,
+      description,
+      status: "pending",
+      assignedTo: selectedUser.id,
+      assignedToName: selectedUser.name,
+      createdBy: currentUser.id,
+      dueDate,
+      progress: 0,
+    });
+
+    toast.success(`Task assigned to ${selectedUser.name}!`);
+    setLoading(false);
+    navigate("/dashboard");
   };
 
   return (
@@ -91,7 +97,7 @@ const CreateTask = () => {
                   <SelectValue placeholder="Select team member" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockUsers.map((user) => (
+                  {users.map((user) => (
                     <SelectItem key={user.id} value={user.id}>
                       {user.name}
                     </SelectItem>

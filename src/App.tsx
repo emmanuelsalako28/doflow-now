@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { TaskProvider } from "@/contexts/TaskContext";
+import { UserProvider } from "@/contexts/UserContext";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 import TaskDetail from "./pages/TaskDetail";
@@ -33,61 +35,65 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <DashboardLayout>
-                <Tasks />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/tasks/:id"
-            element={
-              <DashboardLayout>
-                <TaskDetail />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/create-task"
-            element={
-              <DashboardLayout>
-                <CreateTask />
-              </DashboardLayout>
-            }
-          />
-          <Route
-            path="/team"
-            element={
-              <DashboardLayout>
-                <Team />
-              </DashboardLayout>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <UserProvider>
+        <TaskProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <DashboardLayout>
+                    <Dashboard />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <DashboardLayout>
+                    <Dashboard />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/tasks"
+                element={
+                  <DashboardLayout>
+                    <Tasks />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/tasks/:id"
+                element={
+                  <DashboardLayout>
+                    <TaskDetail />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/create-task"
+                element={
+                  <DashboardLayout>
+                    <CreateTask />
+                  </DashboardLayout>
+                }
+              />
+              <Route
+                path="/team"
+                element={
+                  <DashboardLayout>
+                    <Team />
+                  </DashboardLayout>
+                }
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TaskProvider>
+      </UserProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

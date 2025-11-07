@@ -1,5 +1,7 @@
-import { LayoutDashboard, CheckSquare, Users, Plus } from "lucide-react";
+import { LayoutDashboard, CheckSquare, Users, Plus, User } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useUser } from "@/contexts/UserContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Sidebar,
   SidebarContent,
@@ -10,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -22,6 +25,7 @@ const navItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const { currentUser, setCurrentUser, users } = useUser();
 
   return (
     <Sidebar collapsible="icon">
@@ -73,6 +77,36 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
+      <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupLabel>Current User</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div className="px-2 py-2">
+              <Select
+                value={currentUser.id}
+                onValueChange={(value) => {
+                  const user = users.find((u) => u.id === value);
+                  if (user) setCurrentUser(user);
+                }}
+              >
+                <SelectTrigger>
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <SelectValue />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.name} ({user.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
     </Sidebar>
   );
 }

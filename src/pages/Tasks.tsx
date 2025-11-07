@@ -1,27 +1,20 @@
-import { useState } from "react";
-import { Task } from "@/types/task";
 import { TaskCard } from "@/components/TaskCard";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckSquare } from "lucide-react";
+import { useTasks } from "@/contexts/TaskContext";
+import { useUser } from "@/contexts/UserContext";
 
 const Tasks = () => {
-  const [tasks] = useState<Task[]>([]);
-  const [loading] = useState(false);
+  const { tasks: allTasks } = useTasks();
+  const { currentUser } = useUser();
   const navigate = useNavigate();
 
+  const tasks = allTasks.filter((t) => t.assignedTo === currentUser.id);
   const pendingTasks = tasks.filter((t) => t.status === "pending");
   const inProgressTasks = tasks.filter((t) => t.status === "in-progress");
   const completedTasks = tasks.filter((t) => t.status === "completed");
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
 
   const EmptyState = () => (
     <Card>

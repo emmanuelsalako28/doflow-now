@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { TaskStatus } from "@/types/task";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Calendar, User } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useTasks } from "@/contexts/TaskContext";
+import { useUser } from "@/contexts/UserContext";
 
 const statusConfig = {
   pending: { label: "Pending", color: "bg-status-pending text-white" },
@@ -19,46 +21,44 @@ const statusConfig = {
 };
 
 const TaskDetail = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [loading] = useState(false);
+  const { tasks, updateTask } = useTasks();
+  const { currentUser } = useUser();
   const [updating, setUpdating] = useState(false);
   const [status, setStatus] = useState<TaskStatus>("pending");
   const [progress, setProgress] = useState(0);
 
-  // Mock task data
-  const task = {
-    id: "1",
-    title: "Sample Task",
-    description: "This is a sample task description",
-    status: "pending" as TaskStatus,
-    assignedTo: "1",
-    assignedToName: "John Doe",
-    createdBy: "1",
-    createdAt: new Date(),
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    progress: 0,
-  };
+  const task = tasks.find((t) => t.id === id);
 
-  const handleUpdate = async () => {
-    setUpdating(true);
-    
-    // Simulate update
-    setTimeout(() => {
-      toast.success("Task updated successfully!");
-      setUpdating(false);
-      navigate("/dashboard");
-    }, 1000);
-  };
+  useEffect(() => {
+    if (task) {
+      setStatus(task.status);
+      setProgress(task.progress);
+    }
+  }, [task]);
 
-  if (loading) {
+  if (!task) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <p className="text-lg text-muted-foreground">Task not found</p>
+        <Button onClick={() => navigate("/dashboard")}>Go to Dashboard</Button>
       </div>
     );
   }
 
-  const canEdit = true;
+  const handleUpdate = async () => {
+    setUpdating(true);
+    
+    updateTask(task.id, { status, progress });
+    
+    setTimeout(() => {
+      toast.success("Task updated successfully!");
+      setUpdating(false);
+    }, 500);
+  };
+
+  const canEdit = task.assignedTo === currentUser.id || currentUser.role === "admin";
   const config = statusConfig[task.status];
 
   return (

@@ -1,31 +1,22 @@
-import { useState } from "react";
-import { Task } from "@/types/task";
 import { TaskCard } from "@/components/TaskCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckSquare, Clock, TrendingUp, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTasks } from "@/contexts/TaskContext";
+import { useUser } from "@/contexts/UserContext";
 
 const Dashboard = () => {
-  const [tasks] = useState<Task[]>([]);
-  const [loading] = useState(false);
   const navigate = useNavigate();
+  const { tasks } = useTasks();
+  const { currentUser } = useUser();
 
+  const myTasks = tasks.filter((t) => t.assignedTo === currentUser.id);
   const stats = {
-    total: tasks.length,
-    pending: tasks.filter((t) => t.status === "pending").length,
-    inProgress: tasks.filter((t) => t.status === "in-progress").length,
-    completed: tasks.filter((t) => t.status === "completed").length,
+    total: myTasks.length,
+    pending: myTasks.filter((t) => t.status === "pending").length,
+    inProgress: myTasks.filter((t) => t.status === "in-progress").length,
+    completed: myTasks.filter((t) => t.status === "completed").length,
   };
-
-  const myTasks = tasks;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
